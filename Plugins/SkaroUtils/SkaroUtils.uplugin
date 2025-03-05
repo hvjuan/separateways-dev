@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "SkaroUtils",
+	"Description": "Estudio2 Skaro Utilis",
+	"Category": "Utilities",
+	"CreatedBy": "Estudio2 Games",
+	"CreatedByURL": "https://estudio2.nyc",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EngineVersion": "5.5.0",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "SkaroUtils",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
