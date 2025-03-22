@@ -6,9 +6,7 @@ public class SkaroUtils : ModuleRules
 {
 	public SkaroUtils(ReadOnlyTargetRules Target) : base(Target)
 	{
-		bUsePrecompiled = true;
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
 		
 		PublicIncludePaths.AddRange(
 			new string[] {

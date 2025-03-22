@@ -1,3 +1,5 @@
+// Juan Hernandez-Vargas
+// Estudio2 Games.
 
 #include "Ball.h"
 
@@ -6,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 // #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InterchangeResult.h"
 // #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -25,7 +29,7 @@ ABall::ABall()
 	Capsule->SetGenerateOverlapEvents(true);
 	Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	Capsule->SetupAttachment(GetRootComponent());
-
+	
 	// Mesh.
 	BallMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BallMesh"));
 	BallMesh->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
@@ -34,7 +38,7 @@ ABall::ABall()
 	// Camera.
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->TargetArmLength = CameraBoomLength;
-	CameraBoom->SetWorldRotation(FRotator(-30.f, 0.f, 0.f));
+	CameraBoom->SetWorldRotation(FRotator(-25.f, 0.f, 0.f));
 	// Attach the spring arm to the mid-point of the mesh.
 	CameraBoom->SetRelativeLocation(GetMeshMiddlePoint());
 	// Making the camera follow the ball but not orbit around it.
@@ -55,7 +59,7 @@ ABall::ABall()
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// Getting the right ball.	
 	// RightBall = GetRightBall();
 
@@ -80,12 +84,27 @@ void ABall::PossessedBy(AController* NewController)
 	UE_LOG(LogTemp, Warning, TEXT("=== Ball %s being possessed by: %s ==="), 
 		*GetName(), 
 		NewController ? *NewController->GetName() : TEXT("None"));
+	
+	// Getting current player controllers.
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
+		{
+			Subsystem->AddMappingContext(BallMoveContext, 0);
+			UE_LOG(LogTemp, Warning, TEXT("Player IDL %d"), LocalPlayer->GetControllerId());
+			// Attach the second player.
+			if (LocalPlayer->GetControllerId() == 1)
+			{
+				Player2CPP = this;
+			}
+		}
+	}
 }
 
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	FVector ForwardVector = InitialForwardVector;
 	ForwardVector.Normalize();
 
@@ -94,7 +113,7 @@ void ABall::Tick(float DeltaTime)
 	Speed += BallCurrentSpeed;
 	if (BallCurrentSpeed.X < MaxSpeed)
 	{
-		// Get the mass of the BallMesh compoent.
+		// Get the mass of the BallMesh component.
 		float BallMass = BallMesh->GetMass();
 		// Calculate the force in Newtons.
 		FVector Force = ForwardVector * BallMass * Acceleration;
@@ -134,8 +153,6 @@ int32 ABall::GetControllerType()
 void ABall::BallSidesMove(const FInputActionValue& Value)
 {
 	const float DirectionValue = Value.Get<float>();
-	UE_LOG(LogTemp, Warning, TEXT("BallSidesMove Bool: %d"), Value.Get<bool>());
-	UE_LOG(LogTemp, Warning, TEXT("LeftBallSidesMove: %f"), DirectionValue);
 	if (DirectionValue != 0.f)
     {
 		const FVector RightVector = GetActorRightVector();
@@ -147,11 +164,9 @@ void ABall::BallSidesMove(const FInputActionValue& Value)
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	/*
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Setting up input for Left Ball: %s"), *GetName());
 		EnhancedInputComponent->BindAction(BallSidesMoveAction, ETriggerEvent::Triggered, this, &ABall::BallSidesMove);
+		// EnhancedInputComponent->BindAction(RightBallSidesMoveAction, ETriggerEvent::Triggered, Player2CPP, &ABall::BallSidesMove);
 	}
-	*/
 }

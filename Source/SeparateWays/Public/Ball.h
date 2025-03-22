@@ -26,9 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, Category=Mesh)
 	UStaticMeshComponent* BallMesh;
 
-protected:
 	virtual void BeginPlay() override;
-	void PossessedBy(AController* NewController);
+	virtual void PossessedBy(AController* NewController) override;
 	
 	FVector GetMeshMiddlePoint() const;
 
@@ -55,7 +54,7 @@ protected:
 	USpringArmComponent* CameraBoom;
 
 	UPROPERTY(EditAnywhere, Category=Camera)
-	float CameraBoomLength = 300.f;
+	float CameraBoomLength = 440.f;
 	
 	UPROPERTY(EditAnywhere, Category=Camera)
 	UCameraComponent* ViewCamera;
@@ -87,6 +86,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category="Input")
 	void BallSidesMove(const FInputActionValue& Value);
+
+	UPROPERTY(BlueprintReadWrite, Category="Input")
+	ABall* Player2CPP;
 
 private:
 	FVector InitialForwardVector;
